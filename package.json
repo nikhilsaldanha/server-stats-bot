@@ -37,6 +37,7 @@
     "firebase-admin": "^4.2.0",
     "morgan": "^1.8.0",
     "node-telegram-bot-api": "^0.27.0",
+    "pidusage": "^1.1.1",
     "resource-router-middleware": "^0.6.0",
     "twilio": "^2.11.1"
   },
