@@ -3,8 +3,10 @@ import config from '../config.json';
 import twilio from 'twilio';
 import pusage from 'pidusage';
 
+// Configure twilio. Link account ID with the API key
 let client = twilio(config.twilioAccountId, config.twilioKey);
 
+// Send an SMS alert from twilio number to user's number when server is not responding
 export function sendSMS(from, to, msg) {
 	client.sendMessage({
 		to : to,
@@ -16,6 +18,7 @@ export function sendSMS(from, to, msg) {
 	});
 }
 
+// Responds with the CPU and Memory Usage percentages as a Promise
 export function getMemoryStats() {
 	let data = {
 		stats: {
@@ -25,6 +28,7 @@ export function getMemoryStats() {
 		error: null
 	};
 	return new Promise((resolve, reject) => {
+        // pusage.stat determines the cpu and memory usage
 		pusage.stat(process.pid, (err, stat) => {
 			if (err) {
 				data.error = err;
@@ -34,6 +38,8 @@ export function getMemoryStats() {
 			else {
 				data.stats.cpu_usage = Math.round(stat.cpu * 1e-6);
 				data.stats.memory_usage = Math.round(stat.memory * 1e-6);
+
+                // stop monitoring
 				pusage.unmonitor(process.pid);
 				resolve(data);
 			}
@@ -41,6 +47,7 @@ export function getMemoryStats() {
 	});
 }
 
+// Responds with the top 5 processes in descending order of CPU%
 export function getProcesses() {
 	let data = {
 		stats: null,
@@ -66,6 +73,8 @@ export function getProcesses() {
 	});
 }
 
+// Allows the command `cmd` to be executed on the server
+// Currently, only non-interactive commands work
 export function execCommand(cmd) {
 	let data = {
 		err: null,
@@ -93,15 +102,23 @@ export function execCommand(cmd) {
 	});
 }
 
+// Get System Timings
+// Tests CPU activity during a period of 2 seconds
+// Includes CPU time and User Time and total test time
 export function getTimings() {
 	return new Promise((resolve, reject) => {
+        // start timer
 		var start  = process.hrtime();
+        // initial CPU usage
 		var usageStart = process.cpuUsage();
 
 		var now = Date.now();
+        // run for 2 seconds(2000 ms)
 		while (Date.now() - now < 2000) {}
 
+        // end timer
 		var diff = process.hrtime(start);
+        // diff[0] is in ms and diff[1] is in ns
 		var totalTime = Math.round(diff[0] * 1e3 + diff[1] * 1e-6);
 		var usageEnd = process.cpuUsage(usageStart);
 		var totalUser = Math.round(usageEnd.user * 1e-3);
@@ -110,6 +127,12 @@ export function getTimings() {
 	});
 }
 
+// sends a request to `url`
+// responds with a Promise
+// max timeout of 5 seconds
+// if response is in < 5s, promise resolves
+// else if > 5s or error, promise rejects
+// returns timestamp, response code & message, response time and whether alive
 export function checkServer(url) {
 	let options = {
 		url: url,
@@ -135,9 +158,11 @@ export function checkServer(url) {
 			reject(output);
 		})
 		.on('socket', res => {
+            // start timer for response time
 			start = process.hrtime();
 		})
 		.on('response', res => {
+            // end response time timer
 			let diff = process.hrtime(start);
 			output.status.response_time = diff[0] * 1e3 + diff[1] * 1e-6;
 			output.status.code = res.statusCode;

@@ -42,22 +42,22 @@ initializeDb(db => {
 	let userRef = db.ref('/user');
 	let urlRef = db.ref('/url');
 
+    // event emitter for cron jobs
     const jobEmitter = new EventEmitter();
-
+    // stop job
     jobEmitter.on('stop', (job) => {
-		// console.log(`Stopped job: ${job}`);
 		job.stop();
 	});
-
+    // start job
 	jobEmitter.on('start', (job) => {
 		job.start();
 	});
 
-    var checkServerJob = new CronJob('*/30 * * * * *', () => {
-		
+    // cron job that checks a given url every 30 seconds
+    var checkServerJob = new CronJob('*/30 * * * * *', () => {	
 		urlRef.once('value')
 			.then(url => {
-				return util.checkServer(url.val());
+				return  util.checkServer(url.val());
 			})
 			.then((output) => {
 				statusRef.push(output);
@@ -74,12 +74,12 @@ initializeDb(db => {
 			});
 	}, () => { console.log('Server Unresponsive, stopping the cron job and sending sms...'); }, false);
 
+    // cron job that reports via telegram bot every minute
 	var reportServerJob = new CronJob('*/1 * * * *', () => {
 		let user = userRef.once('value');
 		let status = statusRef.orderByKey().limitToLast(5).once('value');
 		Promise.all([user, status]).then(values => {
 			if (values[0].val() != null && values[1].val() != null) {
-				console.log(JSON.stringify(values[1].val(), null, 2));
 				bot.sendMessage(values[0].val(), JSON.stringify(values[1].val(), null, 2));
 			}
 		}).catch(err => {
@@ -87,20 +87,84 @@ initializeDb(db => {
 		});
 	}, () => { console.log('Stop monitoring server...'); }, false);
 
+    // starts monitoring the url supplied after 'start'
+    // checks the url every 30s
+    // if down or unresponsive, sends a message on telegram as well as an alert sms and stops
+    // a report is also sent every minute with last 5 polls
 	bot.onText(/\/start (.+)/, (msg, match) => {
 		const user = msg.chat.id.toString();
 		userRef.set(user);
 		urlRef.set(match[1]);
 		bot.sendMessage(user, `Tracking ${match[1]} ...`);
+        
+        // start the server monitor and reporter
 		jobEmitter.emit('start', checkServerJob);
 		jobEmitter.emit('start', reportServerJob);
 	});
 
+    // stops the monitoring of server
 	bot.onText(/\/stop/, (msg) => {
 		const user = msg.chat.id.toString();
 		bot.sendMessage(user, `Stop monitoring server ...`);
 		jobEmitter.emit('stop', checkServerJob);
 		jobEmitter.emit('stop', reportServerJob);
+	});
+
+    // single check of the url provided
+    bot.onText(/\/status (.+)/, (msg, match) => {
+		const user = msg.chat.id.toString();
+		userRef.set(user);
+		urlRef.set(match[1]);
+		bot.sendMessage(user, `Checking ${match[1]} ...`);
+        util.checkServer(match[1])
+            .then((output) => {
+                bot.sendMessage(user, JSON.stringify(output, null, 2));
+            })
+            .catch((output) => {
+                util.sendSMS(config.twilioNum, config.clientNum, `${output.status.msg}!`);
+                bot.sendMessage(user, `Server Unresponsive, tracking is stopped\n\n----------------------------\nStatus:\n\n${JSON.stringify(output.status, null, 2)}`);
+            });
+    });
+
+    // check the memory stats of the server
+    bot.onText(/\/memstats/, (msg) => {
+		util.getMemoryStats()
+			.then(data => {
+				bot.sendMessage(msg.chat.id, `CPU Usage: ${data.stats.cpu_usage}MB\nMemory Usage: ${data.stats.memory_usage}MB`);
+			})
+			.catch(data => {
+				bot.sendMessage(msg.chat.id, data.error);
+			});
+	});
+	
+    // check top 5 processes wrt cpu%
+	bot.onText(/\/processes/, (msg) => {
+		util.getProcesses()
+			.then(data => {
+				bot.sendMessage(msg.chat.id, `Processes:\n ${data.stats}`);
+			})
+			.catch(data => {
+				bot.sendMessage(msg.chat.id, data.error);
+			});
+	});
+	
+    // check system time stats
+	bot.onText(/\/timestats/, (msg) => {
+		util.getTimings()
+			.then(data => {
+				bot.sendMessage(msg.chat.id, `System Time Usage:\nTotal Test Time: ${data.totalTime}ms\nSystem Time: ${data.sysTime}ms\nUser Time: ${data.userTime}ms`);
+			});
+	});
+
+    // execute non-interactive commands on server
+	bot.onText(/\/exec (.+)/, (msg, match) => {
+		util.execCommand(match[1])
+			.then(output => {
+				bot.sendMessage(msg.chat.id, output.stdout);
+			})
+			.catch(output => {
+				bot.sendMessage(msg.chat.id, output.err);
+			});
 	});
 
     // capture the updates sent by telegram to the webhook
