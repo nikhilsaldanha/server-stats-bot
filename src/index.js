@@ -4,7 +4,10 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import initializeDb from './db';
 import config from './config.json';
+import * as util from './lib/util';
+import {CronJob} from 'cron';
 import TelegramBot from 'node-telegram-bot-api'; //api for telegram bots
+import EventEmitter from 'events';
 
 const bot = new TelegramBot(config.botToken, {polling: false});
 
@@ -39,12 +42,51 @@ initializeDb(db => {
 	let userRef = db.ref('/user');
 	let urlRef = db.ref('/url');
 
+    const jobEmitter = new EventEmitter();
+
+    jobEmitter.on('stop', (job) => {
+		// console.log(`Stopped job: ${job}`);
+		job.stop();
+	});
+
+	jobEmitter.on('start', (job) => {
+		job.start();
+	});
+
+    var checkServerJob = new CronJob('*/30 * * * * *', () => {
+		
+		urlRef.once('value')
+			.then(url => {
+				return util.checkServer(url.val());
+			})
+			.then((output) => {
+				statusRef.push(output);
+			})
+			.catch((output) => {
+				statusRef.push(output);
+			});
+	}, () => { console.log('Server Unresponsive, stopping the cron job and sending sms...'); }, false);
+
+	var reportServerJob = new CronJob('*/1 * * * *', () => {
+		let user = userRef.once('value');
+		let status = statusRef.orderByKey().limitToLast(5).once('value');
+		Promise.all([user, status]).then(values => {
+			if (values[0].val() != null && values[1].val() != null) {
+				console.log(JSON.stringify(values[1].val(), null, 2));
+				bot.sendMessage(values[0].val(), JSON.stringify(values[1].val(), null, 2));
+			}
+		}).catch(err => {
+			console.log(err);
+		});
+	}, () => { console.log('Stop monitoring server...'); }, false);
 
     bot.onText(/\/start (.+)/, (msg, match) => {
 		const user = msg.chat.id.toString();
 		userRef.set(user);
 		urlRef.set(match[1]);
 		bot.sendMessage(user, `Tracking ${match[1]} ...`);
+        jobEmitter.emit('start', checkServerJob);
+		jobEmitter.emit('start', reportServerJob);
 	});
 
     // capture the updates sent by telegram to the webhook
