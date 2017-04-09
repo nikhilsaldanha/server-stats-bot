@@ -2,6 +2,7 @@ import http from 'http';
 import express from 'express';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
+import initializeDb from './db';
 import config from './config.json';
 import TelegramBot from 'node-telegram-bot-api'; //api for telegram bots
 
@@ -25,13 +26,36 @@ app.use(bodyParser.json({
     limit: config.bodyLimit
 }));
 
-// capture the updates sent by telegram to the webhook
-app.post(`/bot${config.botToken}`, (req, res) => {
-    bot.processUpdate(req.body);
-    res.sendStatus(200);
-});
+// start app only after database is initialized
+initializeDb(db => {
+    // get references to part of structure that is required
+    // structure looks like follows
+    // {    
+    //      status: {...}, <--- status of servers
+    //      user:   "...", <--- userID
+    //      url:    "..."  <--- urls corresponding to server
+    // }
+    let statusRef = db.ref('/status');
+	let userRef = db.ref('/user');
+	let urlRef = db.ref('/url');
 
-app.server.listen(process.env.PORT || config.port);
-console.log(`Started on port ${app.server.address().port}`);
+
+    bot.onText(/\/start (.+)/, (msg, match) => {
+		const user = msg.chat.id.toString();
+		userRef.set(user);
+		urlRef.set(match[1]);
+		bot.sendMessage(user, `Tracking ${match[1]} ...`);
+	});
+
+    // capture the updates sent by telegram to the webhook
+    app.post(`/bot${config.botToken}`, (req, res) => {
+        bot.processUpdate(req.body);
+        res.sendStatus(200);
+    });
+
+    app.server.listen(process.env.PORT || config.port);
+    console.log(`Started on port ${app.server.address().port}`);
+
+});
 
 export default app;
