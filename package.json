@@ -37,7 +37,8 @@
     "firebase-admin": "^4.2.0",
     "morgan": "^1.8.0",
     "node-telegram-bot-api": "^0.27.0",
-    "resource-router-middleware": "^0.6.0"
+    "resource-router-middleware": "^0.6.0",
+    "twilio": "^2.11.1"
   },
   "devDependencies": {
     "eslint": "^3.1.1",

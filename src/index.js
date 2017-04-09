@@ -64,6 +64,13 @@ initializeDb(db => {
 			})
 			.catch((output) => {
 				statusRef.push(output);
+				util.sendSMS(config.twilioNum, config.clientNum, `${output.status.msg}!`);
+				userRef.once('value')
+					.then(user => {
+						bot.sendMessage(user.val(), `Server Unresponsive, tracking is stopped\n\n----------------------------\nStatus:\n\n${JSON.stringify(output.status, null, 2)}`);
+						jobEmitter.emit('stop', checkServerJob);
+						jobEmitter.emit('stop', reportServerJob);
+					});
 			});
 	}, () => { console.log('Server Unresponsive, stopping the cron job and sending sms...'); }, false);
 
@@ -80,13 +87,20 @@ initializeDb(db => {
 		});
 	}, () => { console.log('Stop monitoring server...'); }, false);
 
-    bot.onText(/\/start (.+)/, (msg, match) => {
+	bot.onText(/\/start (.+)/, (msg, match) => {
 		const user = msg.chat.id.toString();
 		userRef.set(user);
 		urlRef.set(match[1]);
 		bot.sendMessage(user, `Tracking ${match[1]} ...`);
-        jobEmitter.emit('start', checkServerJob);
+		jobEmitter.emit('start', checkServerJob);
 		jobEmitter.emit('start', reportServerJob);
+	});
+
+	bot.onText(/\/stop/, (msg) => {
+		const user = msg.chat.id.toString();
+		bot.sendMessage(user, `Stop monitoring server ...`);
+		jobEmitter.emit('stop', checkServerJob);
+		jobEmitter.emit('stop', reportServerJob);
 	});
 
     // capture the updates sent by telegram to the webhook

@@ -1,4 +1,20 @@
 import request from 'request';
+import config from '../config.json';
+import twilio from 'twilio';
+
+let client = twilio(config.twilioAccountId, config.twilioKey);
+
+export function sendSMS(from, to, msg) {
+	client.sendMessage({
+		to : to,
+		from : from,
+		body : msg
+	}, function( err, data ) { 
+		if (err) throw err;
+		else console.log('Sent SMS');
+	});
+}
+
 
 export function checkServer(url) {
 	let options = {
