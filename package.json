@@ -35,7 +35,7 @@
     "express": "^4.13.3",
     "morgan": "^1.8.0",
     "node-telegram-bot-api": "^0.27.0",
-    "resource-router-middleware": "^0.6.0",
+    "resource-router-middleware": "^0.6.0"
   },
   "devDependencies": {
     "eslint": "^3.1.1",

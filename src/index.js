@@ -31,7 +31,7 @@ app.post(`/bot${config.botToken}`, (req, res) => {
     res.sendStatus(200);
 });
 
-app.server.listen(process.env.PORT || config.PORT);
+app.server.listen(process.env.PORT || config.port);
 console.log(`Started on port ${app.server.address().port}`);
 
 export default app;
