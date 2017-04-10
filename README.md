@@ -60,7 +60,7 @@ You may also want to use your own firebase realtime DB, in that case, replace th
 
 |          Command           |  Description  |
 |------------------------------|:-------------:|
-|       `/startmonitor <url>`      | starts monitoring the url checking for uptime. Sends periodic notifications on Telegram. Sends SMS if down and stops monitoring. Use `/stop` if you want the monitoring to stop |
+|       `/startmonitor <url>`      | starts monitoring the url checking for uptime. Sends periodic notifications on Telegram. Report is sent every minute(can be changed by modifying the cron task). Sends SMS if down and stops monitoring. Use `/stop` if you want the monitoring to stop. |
 |    `/stop`   | stops monitoring the url |
 |     `/status <url>`    |    a single report of the server is given rather than continuous monitoring   |
 |    `/memstats`   | reports the cpu and memory usage of the server |
@@ -74,5 +74,6 @@ You may also want to use your own firebase realtime DB, in that case, replace th
 - Currently works only for single user. Need to setup a db architecture that allows multiple users to be notified simultaneously
 - Better memory and process stats with more control and information
 - Execute interactive commands
+- Allow user to modify the report and server monitoring frequency (currently a report is sent every minute to telegram)
 - Add NLP capabilities to improve overall UX
-- Move this code to an independent server so that any server can setup an enpoint to get stats for their server
+- Move this code to an independent server so that any server can setup an endpoint to get stats for their server
