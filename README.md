@@ -1,6 +1,16 @@
 # server-stats-bot
 A Telegram Bot which provides notifications about your server.
 
+## Design
+- Node.js application to provide server notifications
+- Telegram Bot framework for the Chat UI and architecture. Almost no work required
+- Telegram Bot API([node-telegram-bot-api](https://github.com/yagop/node-telegram-bot-api)) for communicating with user. Simple and effective.
+- Used [node-cron](https://github.com/merencia/node-cron) to make periodic requests more simple and manageable
+- Integrated with [Twilio](https://www.twilio.com/) for messaging service when the app is down
+- Used [ngrok](https://ngrok.com/download) for a secure and certified server to run this on during testing and development
+- Integrated with [Firebase](https://firebase.google.com/) for a realtime DB with minimal setup and simple JSON Structure makes it convenient to use in Node.js
+- Deployed on [Heroku](http://heroku.com/) which is quite easy to use and manageable with git
+
 ## Features of the bot
 - Monitor your server periodically
 - Get instant notifications if your server is down.
@@ -57,3 +67,12 @@ You may also want to use your own firebase realtime DB, in that case, replace th
 |    `/processes`  | reports the top 5 memory consuming processes on your server(currently returns any 5 processes (unordered) in production)  |
 |  `/timestats`  |  does a timed test and reports the total system and total user time in that interval  |
 |   `/exec <cmd>`   |   executes the `<cmd>` command on the server. Currently, only for non-interactive commands   |
+
+---
+## Future Contributions
+- The data sent to the user is in JSON, needs to be formatted for a decent UX
+- Currently works only for single user. Need to setup a db architecture that allows multiple users to be notified simultaneously
+- Better memory and process stats with more control and information
+- Execute interactive commands
+- Add NLP capabilities to improve overall UX
+- Move this code to an independent server so that any server can setup an enpoint to get stats for their server
