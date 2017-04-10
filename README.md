@@ -25,13 +25,13 @@ Change the `config.json` file based on your requirements and API keys and such
 	"port": 4041,
 	"bodyLimit": "100kb",
 	"corsHeaders": ["Link"],
-	"botToken": "374263940:AAFTUrQ9CTR8aCYXVH9EFerKfKhXAPAKqcI",
-	"devUrl": "https://4aed766a.ngrok.io",
-	"prodUrl": "https://rocky-stream-81175.herokuapp.com",
-	"twilioAccountId": "AC2b411fe59101136b4c74aa6471302a3e",
-	"twilioKey": "4c3cab33d1cc39cefa29153d090de020",
-	"twilioNum": "+13342199967",
-	"clientNum": "+919449323382"
+	"botToken": "<Your Telegram Bot Token>",
+	"devUrl": "<ngrok secure URL>",
+	"prodUrl": "<Production Server URL>",
+	"twilioAccountId": <Twilio Account ID>,
+	"twilioKey": <Twilio API Key>,
+	"twilioNum": <Your Twilio Number>,
+	"clientNum": <Your Phone Number>
 }
 
 ```
