@@ -18,7 +18,7 @@ if (process.env.NODE_ENV == 'development') {
 }
 // in production, use the secure heroku url to which this code will be deployed
 else {
-    bot.setWebHook(`${prodUrl}/bot${botToken}`);
+    bot.setWebHook(`${config.prodUrl}/bot${botToken}`);
 }
 
 let app = express();
