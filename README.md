@@ -10,16 +10,6 @@ A Telegram Bot which provides notifications about your server.
 - Limited Shell executions
 
 ---
-## Commands
-- `/start <url>` -  starts monitoring the url checking for uptime. Sends periodic notifications on Telegram. Sends SMS if down
-- `/stop` -         stops monitoring the url
-- `/status <url>` - a single report of the server is given rather than continuous monitoring
-- `/memstats` -     reports the cpu and memory usage of the server
-- `/processes` -    reports the top 5 memory consuming processes on your server
-- `/timestats` -    does a timed test and reports the total system and total user time in that interval
-- `/exec <cmd>` -   executes the <cmd> command on the server. Currently, only for non-interactive commands
-
----
 ## Development Requirements
 1. [NPM](https://www.npmjs.com/get-npm)
 2. [Node.js](https://github.com/nodejs/node) : LTS version 6.10.2
@@ -29,10 +19,41 @@ A Telegram Bot which provides notifications about your server.
 6. [Firebase](https://firebase.google.com/) : For realtime DB
 7. [Telegram](https://telegram.org/) : For the bot framework
 
+Change the `config.json` file based on your requirements and API keys and such
+```json
+{
+	"port": 4041,
+	"bodyLimit": "100kb",
+	"corsHeaders": ["Link"],
+	"botToken": "374263940:AAFTUrQ9CTR8aCYXVH9EFerKfKhXAPAKqcI",
+	"devUrl": "https://4aed766a.ngrok.io",
+	"prodUrl": "https://rocky-stream-81175.herokuapp.com",
+	"twilioAccountId": "AC2b411fe59101136b4c74aa6471302a3e",
+	"twilioKey": "4c3cab33d1cc39cefa29153d090de020",
+	"twilioNum": "+13342199967",
+	"clientNum": "+919449323382"
+}
+
+```
+
+You may also want to use your own firebase realtime DB, in that case, replace the contents of `firebase-admin-sdk` with your own admin SDK for firebase realtime db
+
 ---
 ## Usage
 1. Signup on Telegram and get @Server23TestBot Telegram Bot (No sane name was available)
-2. Enter any of the commands listed in commands section above
+2. Signup for Twilio and replace the credentials in `config.json` with your own. This allows you to get SMS notifications when your server is down
+2. Enter any of the commands listed in commands section below
 3. Enjoy
 
 ---
+## Commands(From Telegram Bot @Server23TestBot)
+
+|          Command           |  Description  |
+|------------------------------|:-------------:|
+|       `/startmonitor <url>`      | starts monitoring the url checking for uptime. Sends periodic notifications on Telegram. Sends SMS if down and stops monitoring. Use `/stop` if you want the monitoring to stop |
+|    `/stop`   | stops monitoring the url |
+|     `/status <url>`    |    a single report of the server is given rather than continuous monitoring   |
+|    `/memstats`   | reports the cpu and memory usage of the server |
+|    `/processes`  | reports the top 5 memory consuming processes on your server(currently returns any 5 processes (unordered) in production)  |
+|  `/timestats`  |  does a timed test and reports the total system and total user time in that interval  |
+|   `/exec <cmd>`   |   executes the `<cmd>` command on the server. Currently, only for non-interactive commands   |
