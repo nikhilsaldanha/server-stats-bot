@@ -56,7 +56,7 @@ You may also want to use your own firebase realtime DB, in that case, replace th
 3. Enjoy
 
 ---
-## Commands(From Telegram Bot @Server23TestBot)
+## Commands(For Telegram Bot @Server23TestBot)
 
 |          Command           |  Description  |
 |------------------------------|:-------------:|
