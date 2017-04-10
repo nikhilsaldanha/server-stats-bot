@@ -144,7 +144,7 @@ initializeDb(db => {
 				bot.sendMessage(msg.chat.id, `Processes:\n ${data.stats}`);
 			})
 			.catch(data => {
-				bot.sendMessage(msg.chat.id, data.error);
+				bot.sendMessage(msg.chat.id, data.error.msg);
 			});
 	});
 	

@@ -67,6 +67,7 @@ export function getProcesses() {
 			}
 			else {
 				data.stats = stdout.split('\n').slice(0, 6).join('\n');
+				console.log(data.stats);
 				resolve(data);
 			}
 		});
