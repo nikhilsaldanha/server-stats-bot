@@ -56,7 +56,15 @@ export function getProcesses() {
 	const exec = require('child_process').exec;
 
 	return new Promise((resolve, reject) => {
-		exec('ps -r -eo command,%cpu,%mem', (err, stdout, stderr) => {
+		let cmd;
+
+		if (process.env.NODE_ENV == 'development') {
+			cmd = 'ps -r -eo command,%cpu,%mem';
+		}
+		else {
+			cmd = 'ps -eo command,%cpu,%mem';
+		}
+		exec(cmd, (err, stdout, stderr) => {
 			if (err) {
 				data.error = err;
 				reject(data);
