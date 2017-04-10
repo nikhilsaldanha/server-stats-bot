@@ -91,7 +91,7 @@ initializeDb(db => {
     // checks the url every 30s
     // if down or unresponsive, sends a message on telegram as well as an alert sms and stops
     // a report is also sent every minute with last 5 polls
-	bot.onText(/\/start (.+)/, (msg, match) => {
+	bot.onText(/\/startmonitor (.+)/, (msg, match) => {
 		const user = msg.chat.id.toString();
 		userRef.set(user);
 		urlRef.set(match[1]);
@@ -160,10 +160,16 @@ initializeDb(db => {
 	bot.onText(/\/exec (.+)/, (msg, match) => {
 		util.execCommand(match[1])
 			.then(output => {
-				bot.sendMessage(msg.chat.id, output.stdout);
+				bot.sendMessage(msg.chat.id, output.stdout)
+					.catch(err => {
+						bot.sendMessage(msg.chat.id, err.message.split(': ')[2]);
+					});
 			})
 			.catch(output => {
-				bot.sendMessage(msg.chat.id, output.err);
+				bot.sendMessage(msg.chat.id, output.err)
+					.catch(err => {
+						console.log(err.message);
+					});
 			});
 	});
 

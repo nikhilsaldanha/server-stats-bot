@@ -56,7 +56,7 @@ export function getProcesses() {
 	const exec = require('child_process').exec;
 
 	return new Promise((resolve, reject) => {
-		exec('ps -r -eo command,%cpu,%mem | head -6', (err, stdout, stderr) => {
+		exec('ps -r -eo command,%cpu,%mem', (err, stdout, stderr) => {
 			if (err) {
 				data.error = err;
 				reject(data);
@@ -66,7 +66,7 @@ export function getProcesses() {
 				resolve(data);
 			}
 			else {
-				data.stats = stdout;
+				data.stats = stdout.split('\n').slice(0, 6).join('\n');
 				resolve(data);
 			}
 		});
