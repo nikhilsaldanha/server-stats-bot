@@ -28,10 +28,10 @@ Change the `config.json` file based on your requirements and API keys and such
 	"botToken": "<Your Telegram Bot Token>",
 	"devUrl": "<ngrok secure URL>",
 	"prodUrl": "<Production Server URL>",
-	"twilioAccountId": <Twilio Account ID>,
-	"twilioKey": <Twilio API Key>,
-	"twilioNum": <Your Twilio Number>,
-	"clientNum": <Your Phone Number>
+	"twilioAccountId": "<Twilio Account ID>",
+	"twilioKey": "<Twilio API Key>",
+	"twilioNum": "<Your Twilio Number>",
+	"clientNum": "<Your Phone Number>"
 }
 
 ```
