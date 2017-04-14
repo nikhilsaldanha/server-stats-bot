@@ -20,40 +20,51 @@ A Telegram Bot which provides notifications about your server.
 - Limited Shell executions
 
 ---
-## Development Requirements
-1. [NPM](https://www.npmjs.com/get-npm)
-2. [Node.js](https://github.com/nodejs/node) : LTS version 6.10.2
-3. [ngrok](https://ngrok.com/download) : Provides a secure and certified server to run this on during development
-4. [Heroku](http://heroku.com/) : For deployment
-5. [Twilio](https://www.twilio.com/) : For SMS service
-6. [Firebase](https://firebase.google.com/) : For realtime DB
-7. [Telegram](https://telegram.org/) : For the bot framework
-
-Change the `config.json` file based on your requirements and API keys and such
-```json
-{
-	"port": 4041,
-	"bodyLimit": "100kb",
-	"corsHeaders": ["Link"],
-	"botToken": "<Your Telegram Bot Token>",
-	"devUrl": "<ngrok secure URL>",
-	"prodUrl": "<Production Server URL>",
-	"twilioAccountId": "<Twilio Account ID>",
-	"twilioKey": "<Twilio API Key>",
-	"twilioNum": "<Your Twilio Number>",
-	"clientNum": "<Your Phone Number>"
-}
-
-```
-
-You may also want to use your own firebase realtime DB, in that case, replace the contents of `firebase-admin-sdk` with your own admin SDK for firebase realtime db
-
----
 ## Usage
 1. Signup on Telegram and get @Server23TestBot Telegram Bot (No sane name was available)
 2. Signup for Twilio and replace the credentials in `config.json` with your own. This allows you to get SMS notifications when your server is down
 2. Enter any of the commands listed in commands section below
 3. Enjoy
+
+---
+## Development Requirements
+1. [NPM](https://www.npmjs.com/get-npm)
+2. [Node.js](https://github.com/nodejs/node) : LTS version 6.10.2
+3. [ngrok](https://ngrok.com/download) : Provides a secure and certified server to run this on during development
+4. [Heroku](http://heroku.com/) : For easy deployment (you may use other services)
+5. [Twilio](https://www.twilio.com/) : For SMS service
+6. [Firebase](https://firebase.google.com/) : For realtime DB
+7. [Telegram](https://telegram.org/) : For the bot framework
+
+- Change the `config.json` file based on your requirements and API keys and such
+```json
+{
+	"port": 4041,
+	"bodyLimit": "100kb",
+	"corsHeaders": ["Link"],
+	"botToken": "<telegram-bot-token>",
+	"devUrl": "<secure-ngrok-url>",
+	"prodUrl": "<production-url>",
+	"twilioAccountId": "<twilio-account-id>",
+	"twilioKey": "<twilio-key>",
+	"twilioNum": "<twilio-given-number>",
+	"clientNum": "<your-personal-twilio-registered-number>"
+}
+
+```
+- Next, you will need to create a Firebase account if you don't have one already. Create a new project and generate your SDK. Check the [Firebase docs](https://firebase.google.com/docs/admin/setup#add_the_sdk) for a step by step guide.
+
+- At the end of it, you should have downloaded an SDK file. Copy the contents of that file into `firebase-admin-sdk` file in the `src` directory. This links your project to the Firebase realtime DB.
+
+- Signup on Telegram and ask @BotFather to give you a new Telegram Bot along with it API key, which you enter into `config.json`. Check this [Telegram Guide](https://core.telegram.org/bots#creating-a-new-bot).
+
+- Signup on Twilio and create a programmable SMS service. It's free of cost! After you generate the Twilio number, add it to `config.json` along with the number where you would like to receive SMSs from the bot.
+
+- To install all the node modules locally, run `npm install`.
+
+- To start the server locally, you can start up ngrok on the same port as in the `config.json` file (4041 by default) using the command `ngrok http <port-number>`.
+
+- Now, run `npm run dev` to start the server. Test out the Bot by sending it one of the commands listed below.
 
 ---
 ## Commands(For Telegram Bot @Server23TestBot)
